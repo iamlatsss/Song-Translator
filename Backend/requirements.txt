@@ -4,3 +4,4 @@ transformers
 sentencepiece
 torch
 pandas
+deep-translator

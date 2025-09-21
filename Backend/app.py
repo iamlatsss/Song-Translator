@@ -1,23 +1,34 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+import pandas as pd
+from deep_translator import GoogleTranslator  # <- new translator
 
 app = Flask(__name__)
 CORS(app)
 
-# Dummy endpoint to test
-@app.route('/api/translate', methods=['POST'])
-def translate_song():
-    data = request.json
-    song_name = data.get('song_name')
-    
-    # Replace this with your NLP model logic
-    english_lyrics = "This is the English lyrics of " + song_name
-    tamil_lyrics = "இது " + song_name + " பாடலின் தமிழ் பாடல் வரிகள்"
-    
-    return jsonify({
-        "english": english_lyrics,
-        "tamil": tamil_lyrics
-    })
+df = pd.read_csv("songs.csv")
+
+
+@app.route("/songs")
+def get_songs():
+    songs = df["Title"].tolist()
+    return jsonify({"songs": songs})
+
+
+@app.route("/lyrics", methods=["POST"])
+def get_lyrics():
+    data = request.get_json()
+    song_name = data.get("song")
+
+    lyrics_list = df.loc[df["Title"] == song_name, "Lyric"].values
+    if len(lyrics_list) > 0:
+        english_lyric = lyrics_list[0]
+        # Translate to Tamil
+        tamil_lyric = GoogleTranslator(source='auto', target='ta').translate(english_lyric)
+        return jsonify({"tamil": tamil_lyric})
+    else:
+        return jsonify({"tamil": ""})
+
 
 if __name__ == "__main__":
-    app.run(port=5001, debug=True)
+    app.run(debug=True)

@@ -1,7 +1,10 @@
+import os  
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import pandas as pd
-from deep_translator import GoogleTranslator  # <- new translator
+from deep_translator import GoogleTranslator
+
+port = int(os.environ.get('PORT', 5000))  # 5000 is the fallback if PORT is not set
 
 app = Flask(__name__)
 CORS(app)

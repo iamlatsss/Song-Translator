@@ -6,8 +6,9 @@ from deep_translator import GoogleTranslator  # <- new translator
 app = Flask(__name__)
 CORS(app)
 
-df = pd.read_csv("songs.csv")
+port = int(os.environ.get('PORT', 5000))
 
+df = pd.read_csv("songs.csv")
 
 @app.route("/songs")
 def get_songs():
